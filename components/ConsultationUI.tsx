@@ -3,7 +3,7 @@
 import { useState, useReducer, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { SessionContext, ConversationTurn } from "@/types/session";
-import type { Translations } from "@/lib/i18n";
+import { translateCrop, type Translations } from "@/lib/i18n";
 import TranscriptPanel from "./TranscriptPanel";
 import PushToTalkButton from "./PushToTalkButton";
 
@@ -463,7 +463,7 @@ function buildFallbackOpening(ctx: SessionContext): string {
   const name = farmer.name ? `${farmer.name} ji, ` : "";
   return (
     `Namaste ${name}aapki mitti mein ${defStr} ki kami hai. ` +
-    `Aapke ${recommendations.selected_crop} ke liye, pratyek acre mein ` +
+    `Aapke ${translateCrop(recommendations.selected_crop, ctx.session.language_code)} ke liye, pratyek acre mein ` +
     `${Math.round(rec.urea_kg)} kilo urea, ${Math.round(rec.primary_phosphate_kg)} kilo ${recommendations.fertilizer_type}, ` +
     `aur ${Math.round(rec.potash_kg)} kilo potash ki zaroorat hai. Koi sawaal poochh sakte hain.`
   );

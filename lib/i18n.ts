@@ -1,6 +1,58 @@
 // Internationalisation for the SHC Consultation app.
 // UI strings + localized opening-text builder for all supported languages/dialects.
 
+// ── Crop name translations ──────────────────────────────────────────────────
+
+const CROP_TRANSLATIONS: Record<string, Record<string, string>> = {
+  "hi-IN": {
+    Paddy: "Dhan", Wheat: "Gehun", Maize: "Makka", Mustard: "Sarson",
+    Pulses: "Daalein", Potato: "Aloo", Cotton: "Kapas", Sugarcane: "Ganna",
+    Barley: "Jau", Soybean: "Soybean", Jowar: "Jowar", Tur: "Arhar",
+    Ragi: "Ragi", Groundnut: "Moongphali", Sunflower: "Surajmukhi",
+    Chilli: "Mirch", Banana: "Kela",
+  },
+  "te-IN": {
+    Paddy: "Vari", Wheat: "Godhumalu", Maize: "Mokkajonna", Mustard: "Aavalu",
+    Pulses: "Pappu Dhanyalu", Cotton: "Patti", Sugarcane: "Cheruku",
+    Groundnut: "Verusenaga", Chilli: "Mirapa", Sunflower: "Poddutirugu",
+    Jowar: "Jonnalu", Tur: "Kandi", Banana: "Arati",
+  },
+  "kn-IN": {
+    Paddy: "Bhatta", Wheat: "Godhi", Maize: "Mekkejola", Mustard: "Sasive",
+    Cotton: "Hatti", Sugarcane: "Kabbu", Groundnut: "Shenga",
+    Jowar: "Jola", Ragi: "Ragi", Sunflower: "Suryakanthi",
+    Chilli: "Menasinakayi", Banana: "Bale",
+  },
+  "mr-IN": {
+    Paddy: "Bhat", Wheat: "Gahu", Maize: "Makka", Mustard: "Mohri",
+    Cotton: "Kapus", Sugarcane: "Oos", Soybean: "Soybean",
+    Jowar: "Jowar", Tur: "Tur", Groundnut: "Bhui-mug",
+    Chilli: "Mirchi", Banana: "Kela",
+  },
+  "ta-IN": {
+    Paddy: "Nel", Wheat: "Gothumai", Maize: "Cholam", Mustard: "Kadugu",
+    Cotton: "Paruthi", Sugarcane: "Karumbu", Groundnut: "Nilakadalai",
+    Banana: "Vaazhai", Chilli: "Milagai",
+  },
+  "bn-IN": {
+    Paddy: "Dhan", Wheat: "Gom", Maize: "Bhutta", Mustard: "Shorisher",
+    Pulses: "Dal", Potato: "Aloo", Cotton: "Tula", Sugarcane: "Aakh",
+    Banana: "Kola",
+  },
+  "gu-IN": {
+    Paddy: "Dhan", Wheat: "Ghau", Maize: "Makkai", Mustard: "Rai",
+    Cotton: "Kapas", Sugarcane: "Sherdi", Groundnut: "Mungfali",
+    Banana: "Kela", Chilli: "Marcha",
+  },
+};
+
+/** Translate an English crop name to the farmer's language. Falls back to the English name. */
+export function translateCrop(crop: string, langCode: string): string {
+  const langMap = CROP_TRANSLATIONS[langCode];
+  if (!langMap) return crop;
+  return langMap[crop] ?? crop;
+}
+
 export type LangKey =
   | "hi-IN::Standard"
   | "te-IN::Standard"
@@ -461,11 +513,12 @@ export function buildLocalizedOpeningText(
     : (code === "hi-IN" ? "कोई बड़ी कमी नहीं" : "");
 
   const namePrefix = params.name ? `${params.name}, ` : "";
+  const localCrop = translateCrop(params.crop, code);
   const tpl = OPENING_TEMPLATES[code];
   if (tpl) {
-    return tpl(namePrefix, defStr, params.crop, params.urea, params.fert, params.fertQty, params.potash);
+    return tpl(namePrefix, defStr, localCrop, params.urea, params.fert, params.fertQty, params.potash);
   }
 
   // Fallback to Hindi if language not in templates
-  return OPENING_TEMPLATES["hi-IN"]!(namePrefix, defStr, params.crop, params.urea, params.fert, params.fertQty, params.potash);
+  return OPENING_TEMPLATES["hi-IN"]!(namePrefix, defStr, localCrop, params.urea, params.fert, params.fertQty, params.potash);
 }
