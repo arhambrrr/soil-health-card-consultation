@@ -1,9 +1,69 @@
 import type { SessionContext } from "@/types/session";
 
+// Crop name translations by language code — used so the agent speaks crop names
+// in the farmer's language instead of English.
+const CROP_TRANSLATIONS: Record<string, Record<string, string>> = {
+  "hi-IN": {
+    Paddy: "Dhan", Wheat: "Gehun", Maize: "Makka", Mustard: "Sarson",
+    Pulses: "Daalein", Potato: "Aloo", Cotton: "Kapas", Sugarcane: "Ganna",
+    Barley: "Jau", Soybean: "Soybean", Jowar: "Jowar", Tur: "Arhar",
+    Ragi: "Ragi", Groundnut: "Moongphali", Sunflower: "Surajmukhi",
+    Chilli: "Mirch", Banana: "Kela",
+  },
+  "bho-IN": {
+    Paddy: "Dhan", Wheat: "Gehun", Maize: "Makka", Mustard: "Sarson",
+    Pulses: "Daal", Potato: "Aloo", Cotton: "Kapas", Sugarcane: "Ganna",
+    Barley: "Jau", Soybean: "Soybean", Jowar: "Jowar", Tur: "Arhar",
+    Ragi: "Ragi", Groundnut: "Moongphali", Sunflower: "Surajmukhi",
+    Chilli: "Mirch", Banana: "Kela",
+  },
+  "te-IN": {
+    Paddy: "Vari", Wheat: "Godhumalu", Maize: "Mokkajonna", Mustard: "Aavalu",
+    Pulses: "Pappu Dhanyalu", Cotton: "Patti", Sugarcane: "Cheruku",
+    Groundnut: "Verusenaga", Chilli: "Mirapa", Sunflower: "Poddutirugu",
+    Jowar: "Jonnalu", Tur: "Kandi", Banana: "Arati",
+  },
+  "kn-IN": {
+    Paddy: "Bhatta", Wheat: "Godhi", Maize: "Mekkejola", Mustard: "Sasive",
+    Cotton: "Hatti", Sugarcane: "Kabbu", Groundnut: "Shenga",
+    Jowar: "Jola", Ragi: "Ragi", Sunflower: "Suryakanthi",
+    Chilli: "Menasinakayi", Banana: "Bale",
+  },
+  "mr-IN": {
+    Paddy: "Bhat", Wheat: "Gahu", Maize: "Makka", Mustard: "Mohri",
+    Cotton: "Kapus", Sugarcane: "Oos", Soybean: "Soybean",
+    Jowar: "Jowar", Tur: "Tur", Groundnut: "Bhui-mug",
+    Chilli: "Mirchi", Banana: "Kela",
+  },
+  "ta-IN": {
+    Paddy: "Nel", Wheat: "Gothumai", Maize: "Cholam", Mustard: "Kadugu",
+    Cotton: "Paruthi", Sugarcane: "Karumbu", Groundnut: "Nilakadalai",
+    Banana: "Vaazhai", Chilli: "Milagai",
+  },
+  "bn-IN": {
+    Paddy: "Dhan", Wheat: "Gom", Maize: "Bhutta", Mustard: "Shorisher",
+    Pulses: "Dal", Potato: "Aloo", Cotton: "Tula", Sugarcane: "Aakh",
+    Banana: "Kola",
+  },
+  "gu-IN": {
+    Paddy: "Dhan", Wheat: "Ghau", Maize: "Makkai", Mustard: "Rai",
+    Cotton: "Kapas", Sugarcane: "Sherdi", Groundnut: "Mungfali",
+    Banana: "Kela", Chilli: "Marcha",
+  },
+};
+
+/** Translate an English crop name to the farmer's language. Falls back to the English name. */
+function translateCrop(crop: string, langCode: string): string {
+  const langMap = CROP_TRANSLATIONS[langCode];
+  if (!langMap) return crop;
+  return langMap[crop] ?? crop;
+}
+
 export function buildSystemPrompt(ctx: SessionContext): string {
   const { farmer, soil, recommendations, session } = ctx;
   const rec = recommendations.per_acre;
   const phosphateName = session.fertilizer_type === "DAP" ? "DAP" : "SSP";
+  const cropName = translateCrop(recommendations.selected_crop, session.language_code);
 
   const deficient = Object.entries(soil).filter(([, v]) => v.status === "low").map(([k]) => k);
   const excess    = Object.entries(soil).filter(([, v]) => v.status === "high").map(([k]) => k);
@@ -23,7 +83,7 @@ All advice must be grounded in this farmer's actual soil data. Never give generi
 
 ## This Farmer's Soil Data (ground truth — never contradict)
 Farmer: ${farmer.name || "unknown"}, District: ${farmer.district}
-Plot: ${farmer.plot_area_acres} acres | Crop: ${recommendations.selected_crop} | Fertilizer: ${session.fertilizer_type}
+Plot: ${farmer.plot_area_acres} acres | Crop: ${cropName} (${recommendations.selected_crop}) | Fertilizer: ${session.fertilizer_type}
 ${farmer.card_expired ? "⚠ CARD IS EXPIRED — mention this once and advise them to get a new test done." : ""}
 
 Soil parameters:
@@ -35,7 +95,7 @@ Deficient: ${deficient.length > 0 ? deficient.join(", ") : "none"}
 Excess: ${excess.length > 0 ? excess.join(", ") : "none"}
 Priority to address: ${recommendations.priority_deficiencies.join(", ") || "none"}
 
-Per-acre fertilizer for ${recommendations.selected_crop}:
+Per-acre fertilizer for ${cropName}:
   Urea: ${rec.urea_kg} kg | ${phosphateName}: ${rec.primary_phosphate_kg} kg | Potash: ${rec.potash_kg} kg
 ${recommendations.micronutrients.zinc_sulphate_kg_approximate ? `  Zinc Sulphate: ~${recommendations.micronutrients.zinc_sulphate_kg_approximate} kg (approximate — ask dealer for pack size)` : ""}
 
@@ -126,8 +186,9 @@ export function buildOpeningMessage(ctx: SessionContext): string {
   const { farmer, recommendations, session } = ctx;
   const rec = recommendations.per_acre;
   const phosphateName = session.fertilizer_type === "DAP" ? "DAP" : "SSP";
+  const cropName = translateCrop(recommendations.selected_crop, session.language_code);
   const top2 = recommendations.priority_deficiencies.slice(0, 2);
   const defStr = top2.length > 0 ? top2.join(" aur ") : "koi badi kami nahi";
 
-  return `Namaste ${farmer.name ? farmer.name + " ji" : ""}. Aapki mitti ki jaanch ke anusar, aapke khet mein ${defStr} ki kami hai. Aapke ${recommendations.selected_crop} ke liye pratyek acre mein ${rec.urea_kg} kilo urea, ${rec.primary_phosphate_kg} kilo ${phosphateName}, aur ${rec.potash_kg} kilo potash ki zaroorat hai.`;
+  return `Namaste ${farmer.name ? farmer.name + " ji" : ""}. Aapki mitti ki jaanch ke anusar, aapke khet mein ${defStr} ki kami hai. Aapke ${cropName} ke liye pratyek acre mein ${rec.urea_kg} kilo urea, ${rec.primary_phosphate_kg} kilo ${phosphateName}, aur ${rec.potash_kg} kilo potash ki zaroorat hai.`;
 }
