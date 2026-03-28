@@ -74,9 +74,11 @@ const FORBIDDEN_TOPICS: ForbiddenCategory[] = [
   {
     name: "market_price",
     patterns: [
-      /\b(mandi|bhav|bhaw|rate)\b/i,
+      /\b(mandi|bhav|bhaw)\b/i,
       /\b(MSP|minimum\s+support\s+price)\b/i,
-      /\b(market\s+price|selling\s+price|sell\s+at|buy\s+at|khareed|bikri|bech)\b/i,
+      /\b(market\s+price|selling\s+price)\b/i,
+      /\b(khareed|bech|bikri)\b.*\b(mandi|bhav|rate|daam|bazaar)\b/i,
+      /\b(mandi|bhav|rate|daam|bazaar)\b.*\b(khareed|bech|bikri)\b/i,
       /मंडी/,
       /बाजार\s*भाव/,
     ],
