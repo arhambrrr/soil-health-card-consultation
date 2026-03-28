@@ -3,8 +3,6 @@
 
 export type LangKey =
   | "hi-IN::Standard"
-  | "hi-IN::Bhojpuri"
-  | "hi-IN::Avadhi"
   | "te-IN::Standard"
   | "te-IN::Telangana"
   | "kn-IN::Standard"
@@ -78,8 +76,6 @@ export interface LangOption {
 
 export const LANG_OPTIONS: LangOption[] = [
   { key: "hi-IN::Standard",   native: "हिंदी",             english: "Hindi",              code: "hi-IN",  dialect: "Standard"  },
-  { key: "hi-IN::Bhojpuri",   native: "भोजपुरी",           english: "Bhojpuri",            code: "bho-IN", dialect: "Bhojpuri"  },
-  { key: "hi-IN::Avadhi",     native: "अवधी",               english: "Awadhi",              code: "hi-IN",  dialect: "Avadhi"    },
   { key: "mr-IN::Standard",   native: "मराठी",              english: "Marathi",             code: "mr-IN",  dialect: "Standard"  },
   { key: "te-IN::Standard",   native: "తెలుగు",             english: "Telugu",              code: "te-IN",  dialect: "Standard"  },
   { key: "te-IN::Telangana",  native: "తెలంగాణ తెలుగు",    english: "Telugu (Telangana)",  code: "te-IN",  dialect: "Telangana" },
@@ -408,8 +404,6 @@ const GU: Translations = {
 
 export const TRANSLATIONS: Record<LangKey, Translations> = {
   "hi-IN::Standard":  HI,
-  "hi-IN::Bhojpuri":  HI, // same script/language
-  "hi-IN::Avadhi":    HI,
   "mr-IN::Standard":  MR,
   "te-IN::Standard":  TE,
   "te-IN::Telangana": TE,
@@ -427,8 +421,6 @@ export function getTranslations(langKey: string): Translations {
 
 const DEFICIENCY_NAMES: Record<LangKey, Record<string, string>> = {
   "hi-IN::Standard":  { N:"नाइट्रोजन", P:"फास्फोरस", K:"पोटाश", S:"सल्फर", Zn:"जिंक", B:"बोरोन", Fe:"लोहा", Mn:"मैंगनीज", Cu:"तांबा", OC:"जैविक कार्बन" },
-  "hi-IN::Bhojpuri":  { N:"नाइट्रोजन", P:"फास्फोरस", K:"पोटाश", S:"सल्फर", Zn:"जिंक", B:"बोरोन", Fe:"लोहा", Mn:"मैंगनीज", Cu:"तांबा", OC:"जैविक कार्बन" },
-  "hi-IN::Avadhi":    { N:"नाइट्रोजन", P:"फास्फोरस", K:"पोटाश", S:"सल्फर", Zn:"जिंक", B:"बोरोन", Fe:"लोहा", Mn:"मैंगनीज", Cu:"तांबा", OC:"जैविक कार्बन" },
   "mr-IN::Standard":  { N:"नायट्रोजन", P:"फॉस्फरस", K:"पोटॅश", S:"सल्फर", Zn:"झिंक", B:"बोरॉन", Fe:"लोह", Mn:"मँगेनीज", Cu:"तांबे", OC:"सेंद्रिय कार्बन" },
   "te-IN::Standard":  { N:"నైట్రోజన్", P:"ఫాస్ఫరస్", K:"పొటాష్", S:"సల్ఫర్", Zn:"జింక్", B:"బోరాన్", Fe:"ఐరన్", Mn:"మాంగనీస్", Cu:"కాపర్", OC:"సేంద్రియ కార్బన్" },
   "te-IN::Telangana": { N:"నైట్రోజన్", P:"ఫాస్ఫరస్", K:"పొటాష్", S:"సల్ఫర్", Zn:"జింక్", B:"బోరాన్", Fe:"ఐరన్", Mn:"మాంగనీస్", Cu:"కాపర్", OC:"సేంద్రియ కార్బన్" },
@@ -441,8 +433,6 @@ const DEFICIENCY_NAMES: Record<LangKey, Record<string, string>> = {
 // Templates indexed by base language (dialects share template)
 const OPENING_TEMPLATES: Partial<Record<string, (n: string, defs: string, crop: string, urea: number, fert: string, fertQty: number, potash: number) => string>> = {
   "hi-IN": (n, d, crop, urea, fert, fq, pot) =>
-    `नमस्ते ${n}आपकी मिट्टी में ${d} की कमी है। आपके ${crop} के लिए, प्रत्येक एकड़ में ${Math.round(urea)} किलो यूरिया, ${Math.round(fq)} किलो ${fert}, और ${Math.round(pot)} किलो पोटाश चाहिए। कोई सवाल पूछ सकते हैं।`,
-  "bho-IN": (n, d, crop, urea, fert, fq, pot) =>
     `नमस्ते ${n}आपकी मिट्टी में ${d} की कमी है। आपके ${crop} के लिए, प्रत्येक एकड़ में ${Math.round(urea)} किलो यूरिया, ${Math.round(fq)} किलो ${fert}, और ${Math.round(pot)} किलो पोटाश चाहिए। कोई सवाल पूछ सकते हैं।`,
   "mr-IN": (n, d, crop, urea, fert, fq, pot) =>
     `नमस्ते ${n}तुमच्या मातीत ${d} ची कमतरता आहे। तुमच्या ${crop} साठी, प्रत्येक एकरात ${Math.round(urea)} किलो युरिया, ${Math.round(fq)} किलो ${fert}, आणि ${Math.round(pot)} किलो पोटॅश लागेल। काही प्रश्न विचारा।`,
@@ -468,7 +458,7 @@ export function buildLocalizedOpeningText(
 
   const defStr = params.defs.length > 0
     ? params.defs.map((d) => defNames[d] ?? d).join(", ")
-    : (code === "hi-IN" || code === "bho-IN" ? "कोई बड़ी कमी नहीं" : "");
+    : (code === "hi-IN" ? "कोई बड़ी कमी नहीं" : "");
 
   const namePrefix = params.name ? `${params.name}, ` : "";
   const tpl = OPENING_TEMPLATES[code];

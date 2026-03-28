@@ -22,9 +22,7 @@ const SUPPORTED = new Set([
   "ml-IN", "mr-IN", "od-IN", "pa-IN", "ta-IN", "te-IN",
 ]);
 const FALLBACK: Record<string, string> = {
-  "bho-IN": "hi-IN",
   "mai-IN": "hi-IN",
-  "awa-IN": "hi-IN",
 };
 function normLang(code: string): string {
   if (SUPPORTED.has(code)) return code;

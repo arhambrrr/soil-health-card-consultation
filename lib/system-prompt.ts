@@ -10,13 +10,6 @@ const CROP_TRANSLATIONS: Record<string, Record<string, string>> = {
     Ragi: "Ragi", Groundnut: "Moongphali", Sunflower: "Surajmukhi",
     Chilli: "Mirch", Banana: "Kela",
   },
-  "bho-IN": {
-    Paddy: "Dhan", Wheat: "Gehun", Maize: "Makka", Mustard: "Sarson",
-    Pulses: "Daal", Potato: "Aloo", Cotton: "Kapas", Sugarcane: "Ganna",
-    Barley: "Jau", Soybean: "Soybean", Jowar: "Jowar", Tur: "Arhar",
-    Ragi: "Ragi", Groundnut: "Moongphali", Sunflower: "Surajmukhi",
-    Chilli: "Mirch", Banana: "Kela",
-  },
   "te-IN": {
     Paddy: "Vari", Wheat: "Godhumalu", Maize: "Mokkajonna", Mustard: "Aavalu",
     Pulses: "Pappu Dhanyalu", Cotton: "Patti", Sugarcane: "Cheruku",

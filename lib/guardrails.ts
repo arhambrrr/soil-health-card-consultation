@@ -164,7 +164,6 @@ const ENGLISH_WHITELIST = new Set([
 
 const CANNED_DEFLECTIONS: Record<string, string> = {
   "hi-IN": "Yeh sawaal mere daayare se bahar hai. Kripya apne Krishi Sewak se sampark karein.",
-  "bho-IN": "Yeh sawaal mere daayare se bahar hai. Kripya apne Krishi Sewak se sampark karein.",
   "te-IN": "Ee prashna naa paridhi lo ledu. Dayachesi mee Krishi Sewak ni sampradinchandi.",
   "kn-IN": "Ee prashne nanna vyaptiya horage ide. Dayavittu nimma Krishi Sevaka annu samparkinisi.",
   "mr-IN": "Hya prashnaacha uttara dene mazhya karyakshetrat nahi. Krupaya tumchya Krishi Sewak shi sampark sadha.",
@@ -180,7 +179,6 @@ const CANNED_DEFLECTIONS: Record<string, string> = {
 
 const SAFETY_WARNINGS: Record<string, string> = {
   "hi-IN": "Card mein recommend ki gayi matra se zyada dalna fasal ko nuksan kar sakta hai.",
-  "bho-IN": "Card mein recommend ki gayi matra se zyada dalna fasal ko nuksan kar sakta hai.",
   "te-IN": "Card lo suggest chesina danikantte ekkuva vestey pantalaku haani kaligisthundi.",
   "kn-IN": "Card nalli shifarasu madidakkinta hechchu haakidare belege haani aagabahudhu.",
   "mr-IN": "Card madhye shiFarish keleli matra petaksha aadhik vaparlyaas pikaala nukasan houh shakate.",
