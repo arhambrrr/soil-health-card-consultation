@@ -1,4 +1,4 @@
-// API clients: Groq (Qwen 3.6 27B for Vision OCR + extraction) + Sarvam (LLM, TTS, STT).
+// API clients: Groq (Qwen 3.8 27B for Vision OCR + extraction) + Sarvam (LLM, TTS, STT).
 // Keys are server-side only via env vars — never exposed to the client.
 
 const SARVAM_BASE = "https://api.sarvam.ai";
@@ -29,7 +29,7 @@ function normLang(code: string): string {
   return FALLBACK[code] ?? "hi-IN";
 }
 
-// ── Vision — Groq Qwen 3.6 27B (multimodal, vision+OCR) ─────────────────────
+// ── Vision — Groq Qwen 3.8 27B (multimodal, vision+OCR) ─────────────────────
 // Groq's OpenAI-compatible endpoint accepts base64 images in chat messages.
 
 export async function vision(
@@ -42,7 +42,7 @@ export async function vision(
     : btoa(String.fromCharCode(...new Uint8Array(imageBuffer)));
   const dataUri = `data:${mimeType};base64,${base64}`;
 
-  console.log("[vision] sending to Groq Qwen 3.6 27B, image size:", imageBuffer.byteLength, "bytes");
+  console.log("[vision] sending to Groq Qwen 3.8 27B, image size:", imageBuffer.byteLength, "bytes");
   const visionStart = Date.now();
 
   const res = await fetch(`${GROQ_BASE}/chat/completions`, {
@@ -52,7 +52,7 @@ export async function vision(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "qwen/qwen3.6-27b",
+      model: "qwen/qwen3.8-27b",
       messages: [
         {
           role: "user",
@@ -62,7 +62,7 @@ export async function vision(
           ],
         },
       ],
-      max_completion_tokens: 4096,
+      max_tokens: 4096,
       temperature: 0,
     }),
   });
@@ -171,7 +171,7 @@ export async function speechToText(
   return data.transcript ?? "";
 }
 
-// ── LLM — Groq Qwen 3.6 27B (structured extraction) ────────────────────────
+// ── LLM — Groq Qwen 3.8 27B (structured extraction) ────────────────────────
 // Used for Phase 2 extraction only — reliably follows JSON-only instructions.
 
 export async function groqCompletion(
@@ -186,12 +186,12 @@ export async function groqCompletion(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "qwen/qwen3.6-27b",
+      model: "qwen/qwen3.8-27b",
       messages: [
         { role: "system", content: systemPrompt },
         ...messages,
       ],
-      max_completion_tokens: maxTokens,
+      max_tokens: maxTokens,
       temperature: 0,
       response_format: { type: "json_object" },
     }),
