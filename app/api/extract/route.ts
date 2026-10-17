@@ -6,7 +6,7 @@ import { detectUnit, toAcres, perAcre, rangeMidpoint } from "@/lib/normalization
 import { buildLocalizedOpeningText } from "@/lib/i18n";
 import type { SessionContext, FertilizerType, SoilParameter } from "@/types/session";
 
-export const maxDuration = 60; // Sarvam Vision may take longer than Groq
+export const maxDuration = 60;
 
 // ── Vision prompt — instructs the model to output raw structured text ─────────
 

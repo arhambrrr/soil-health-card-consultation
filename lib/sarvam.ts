@@ -1,4 +1,4 @@
-// API clients: Groq (Vision OCR) + Sarvam (LLM, TTS, STT).
+// API clients: Groq (Qwen 3.6 27B for Vision OCR + extraction) + Sarvam (LLM, TTS, STT).
 // Keys are server-side only via env vars — never exposed to the client.
 
 const SARVAM_BASE = "https://api.sarvam.ai";
@@ -29,7 +29,7 @@ function normLang(code: string): string {
   return FALLBACK[code] ?? "hi-IN";
 }
 
-// ── Vision — Groq Llama 4 Scout (multimodal, ~2–4 s) ─────────────────────────
+// ── Vision — Groq Qwen 3.6 27B (multimodal, vision+OCR) ─────────────────────
 // Groq's OpenAI-compatible endpoint accepts base64 images in chat messages.
 
 export async function vision(
@@ -42,7 +42,7 @@ export async function vision(
     : btoa(String.fromCharCode(...new Uint8Array(imageBuffer)));
   const dataUri = `data:${mimeType};base64,${base64}`;
 
-  console.log("[vision] sending to Groq Llama 4 Scout, image size:", imageBuffer.byteLength, "bytes");
+  console.log("[vision] sending to Groq Qwen 3.6 27B, image size:", imageBuffer.byteLength, "bytes");
   const visionStart = Date.now();
 
   const res = await fetch(`${GROQ_BASE}/chat/completions`, {
@@ -52,7 +52,7 @@ export async function vision(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "meta-llama/llama-4-scout-17b-16e-instruct",
+      model: "qwen/qwen3.6-27b",
       messages: [
         {
           role: "user",
@@ -69,7 +69,7 @@ export async function vision(
 
   if (!res.ok) {
     const body = await res.text().catch(() => "");
-    throw new Error(`Vision (Groq) ${res.status}: ${body.slice(0, 300)}`);
+    throw new Error(`Vision (Groq Qwen) ${res.status}: ${body.slice(0, 300)}`);
   }
 
   const data = await res.json() as {
@@ -171,7 +171,7 @@ export async function speechToText(
   return data.transcript ?? "";
 }
 
-// ── LLM — Groq Llama 3.3 70B (structured extraction) ────────────────────────
+// ── LLM — Groq Qwen 3.6 27B (structured extraction) ────────────────────────
 // Used for Phase 2 extraction only — reliably follows JSON-only instructions.
 
 export async function groqCompletion(
@@ -186,7 +186,7 @@ export async function groqCompletion(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "llama-3.3-70b-versatile",
+      model: "qwen/qwen3.6-27b",
       messages: [
         { role: "system", content: systemPrompt },
         ...messages,
@@ -199,7 +199,7 @@ export async function groqCompletion(
 
   if (!res.ok) {
     const body = await res.text().catch(() => "");
-    throw new Error(`LLM (Groq) ${res.status}: ${body.slice(0, 300)}`);
+    throw new Error(`LLM (Groq Qwen) ${res.status}: ${body.slice(0, 300)}`);
   }
 
   const data = await res.json() as {
